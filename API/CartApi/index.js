@@ -115,7 +115,7 @@ Router.get("/view-cart/:userId", async (req, res) => {
       //console.log(itemPrice,cartItem.itemType);
       const itemTaxRate = calculateTaxAmount(itemPrice, cartItem.itemType);
       const itemTax = itemPrice + itemTaxRate;
-      const itemTotal = itemPricewithTax * cartItem.quantity;
+      const itemTotal = itemTax* cartItem.quantity;
 
       return {
         itemType: cartItem.itemType,
@@ -132,7 +132,7 @@ Router.get("/view-cart/:userId", async (req, res) => {
     const validCartItems = cartItemsWithDetails.filter(item => item !== null);
 
     const totalCost = validCartItems.reduce((total, item) => total + item.itemPrice * item.quantity, 0);
-    const totalTax = validCartItems.reduce((total, item) => total + item.itemPrice * item.quantity, 0);
+    const totalTax = validCartItems.reduce((total, item) => total + item.itemTaxRate*item.quantity, 0);
     console.log(totalTax);
     const totalBill = totalCost + totalTax;
 
