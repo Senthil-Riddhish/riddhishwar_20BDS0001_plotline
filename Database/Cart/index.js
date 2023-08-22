@@ -5,11 +5,10 @@ const cartSchema = new mongoose.Schema({
   items: [
     {
       itemType: { type: String, enum: ["product", "service"], required: true },
-      itemId: { type: mongoose.Schema.Types.ObjectId, required: true },
+      itemId: { type: mongoose.Schema.Types.ObjectId, refPath: "items.itemType", required: true },
       quantity: { type: Number, default: 1 },
     },
-  ],
-  // Other cart-related properties
+  ]
 });
 
 export const CartModel = mongoose.model("Cart", cartSchema);
