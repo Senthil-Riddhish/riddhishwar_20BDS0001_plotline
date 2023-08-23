@@ -1,5 +1,5 @@
 import express from "express";
-import { CartModel, ProductModel, ServiceModel } from "../../Database/allModels"; // Adjust the import paths
+import { CartModel, ProductModel, ServiceModel, UserModel } from "../../Database/allModels"; // Adjust the import paths
 import { ValidateCartItem } from "../../Validation/cart";
 const Router = express.Router();
 
@@ -8,6 +8,16 @@ Router.post("/add-to-cart/:userId", async (req, res) => {
   try {
     const userId = req.params.userId;
     const { itemType, itemId, quantity } = req.body; // Assuming you receive itemType (product or service), itemId, and quantity
+
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const verifiedUserId = UserModel.verifyJwtToken(token);
+    if (!verifiedUserId || verifiedUserId !== userId) {
+      return res.status(401).json({ error: "Session expired. Please log in again." });
+    }
 
     // Add the cart item to the user's cart
     const userCart = await CartModel.findOneAndUpdate(
@@ -21,42 +31,58 @@ Router.post("/add-to-cart/:userId", async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 });
-  
-  // Remove a product or service from the cart
-  Router.delete("/remove/:userId/:itemId", async (req, res) => {
-    try {
-      const { userId, itemId } = req.params;
-      
-      const cart = await CartModel.findOneAndUpdate(
-        { userId },
-        { $pull: { items: { itemId } } },
-        { new: true }
-      );
-  
-      return res.status(200).json({ cart });
-    } catch (error) {
-      return res.status(500).json({ error: error.message });
-    }
-  });
-  
-  // Clear the entire cart for a user
-  Router.delete("/clear/:userId", async (req, res) => {
-    try {
-      const { userId } = req.params;
-  
-      const cart = await CartModel.findOneAndUpdate(
-        { userId },
-        { $set: { items: [] } },
-        { new: true }
-      );
-  
-      return res.status(200).json({ cart });
-    } catch (error) {
-      return res.status(500).json({ error: error.message });
-    }
-  });
 
-  // Calculate tax amount based on tax rules
+// Remove a product or service from the cart
+Router.delete("/remove/:userId/:itemId", async (req, res) => {
+  try {
+    const { userId, itemId } = req.params;
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const verifiedUserId = UserModel.verifyJwtToken(token);
+    if (!verifiedUserId || verifiedUserId !== userId) {
+      return res.status(401).json({ error: "Session expired. Please log in again." });
+    }
+    const cart = await CartModel.findOneAndUpdate(
+      { userId },
+      { $pull: { items: { itemId } } },
+      { new: true }
+    );
+
+    return res.status(200).json({ cart });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// Clear the entire cart for a user
+Router.delete("/clear/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const verifiedUserId = UserModel.verifyJwtToken(token);
+    if (!verifiedUserId || verifiedUserId !== userId) {
+      return res.status(401).json({ error: "Session expired. Please log in again." });
+    }
+    const cart = await CartModel.findOneAndUpdate(
+      { userId },
+      { $set: { items: [] } },
+      { new: true }
+    );
+
+    return res.status(200).json({ cart });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
+// Calculate tax amount based on tax rules
 
 
 // Fetch product/service details based on itemType
@@ -72,17 +98,17 @@ async function getItemDetails(itemId, itemType) {
 const calculateTaxAmount = (price, itemType) => {
   if (itemType === "product") {
     if (price > 1000 && price <= 5000) {
-      return (price*0.12)+200; // ApplyTaxPA
+      return (price * 0.12) + 200; // ApplyTaxPA
     } else if (price > 5000) {
-      return (price*0.18)+200; // ApplyTaxPB
+      return (price * 0.18) + 200; // ApplyTaxPB
     } else {
       return 200; // ApplyTaxPC
     }
   } else if (itemType === "service") {
     if (price > 1000 && price <= 8000) {
-      return (price*0.10)+100; // ApplyTaxSA
+      return (price * 0.10) + 100; // ApplyTaxSA
     } else if (price > 8000) {
-      return (price*0.15)+100; // ApplyTaxSB
+      return (price * 0.15) + 100; // ApplyTaxSB
     } else {
       return 100; // ApplyTaxSC
     }
@@ -98,7 +124,16 @@ Router.get("/view-cart/:userId", async (req, res) => {
 
     // Retrieve the user's cart
     const userCart = await CartModel.findOne({ userId });
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
 
+    const verifiedUserId = UserModel.verifyJwtToken(token);
+    if (!verifiedUserId || verifiedUserId !== userId) {
+      return res.status(401).json({ error: "Session expired. Please log in again." });
+    }
+    
     if (!userCart) {
       return res.status(404).json({ error: "Cart not found" });
     }
@@ -115,7 +150,7 @@ Router.get("/view-cart/:userId", async (req, res) => {
       //console.log(itemPrice,cartItem.itemType);
       const itemTaxRate = calculateTaxAmount(itemPrice, cartItem.itemType);
       const itemTax = itemPrice + itemTaxRate;
-      const itemTotal = itemTax* cartItem.quantity;
+      const itemTotal = itemTax * cartItem.quantity;
 
       return {
         itemType: cartItem.itemType,
@@ -132,15 +167,15 @@ Router.get("/view-cart/:userId", async (req, res) => {
     const validCartItems = cartItemsWithDetails.filter(item => item !== null);
 
     const totalCost = validCartItems.reduce((total, item) => total + item.itemPrice * item.quantity, 0);
-    const totalTax = validCartItems.reduce((total, item) => total + item.itemTaxRate*item.quantity, 0);
+    const totalTax = validCartItems.reduce((total, item) => total + item.itemTaxRate * item.quantity, 0);
     console.log(totalTax);
     const totalBill = totalCost + totalTax;
 
     return res.status(200).json({
       items: validCartItems,
-      totalCost:totalCost,
-      totalTax:totalTax,
-      totalBill:totalBill,
+      totalCost: totalCost,
+      totalTax: totalTax,
+      totalBill: totalBill,
     });
   } catch (error) {
     return res.status(500).json({ error: error.message });
@@ -148,4 +183,4 @@ Router.get("/view-cart/:userId", async (req, res) => {
 });
 
 
-  export default Router;
+export default Router;

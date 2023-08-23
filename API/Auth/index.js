@@ -19,10 +19,8 @@ const Router = express.Router();
  */
 Router.post("/signup", async (req, res) => {
   try {
-    console.log("hi");
     await ValidateSignup(req.body.credentials);
     await UserModel.findByEmailAndPhone(req.body.credentials);
-    console.log("going to creatre");
     const newUser = await UserModel.create(req.body.credentials);
     const token = newUser.generateJwtToken();
     return res.status(200).json({ token, status: "success" });

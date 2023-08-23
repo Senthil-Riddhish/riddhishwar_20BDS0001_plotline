@@ -3,22 +3,32 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
 const UserSchema = new mongoose.Schema(
-    {
-      fullName: { type: String, required: true },
-      email: { type: String, required: true },
-      password: { type: String },
-      phoneNumber: { type: Number }
-    },
-    {
-      timestamps: true,
-    }
-  );
+  {
+    fullName: { type: String, required: true },
+    email: { type: String, required: true },
+    password: { type: String },
+    phoneNumber: { type: Number },
+    role: { type: String, enum: ["user", "admin"], default: "user" }, // Add the role field
+  },
+  {
+    timestamps: true,
+  }
+);
 
 
   UserSchema.methods.generateJwtToken = function () {
-    return jwt.sign({ user: this._id.toString() }, "ZomatoAPP");
+    //return jwt.sign({ user: this._id.toString() }, "PlotlineAPP");
+    return jwt.sign({ user: this._id.toString() }, "PlotlineAPP", { expiresIn: "30m" });
   };
 
+  UserSchema.statics.verifyJwtToken = function (token) {
+    try {
+      const decoded = jwt.verify(token, "PlotlineAPP");
+      return decoded.user;
+    } catch (error) {
+      return null; // Token verification failed
+    }
+  };
 
   UserSchema.statics.findByEmailAndPhone = async ({ email, phoneNumber }) => {
     // check wether email, phoneNumber exists in out database or not
