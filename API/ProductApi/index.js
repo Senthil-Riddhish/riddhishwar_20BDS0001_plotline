@@ -1,34 +1,12 @@
 import express from "express";
 import { ProductModel,UserModel } from "../../Database/allModels"; // Adjust the import path
 import { ValidateProduct } from "../../Validation/product"; // Adjust the import path
+import { isAdmin } from "../../Validation/isAdmin";
+
 const Router = express.Router();
 
 const jwt = require("jsonwebtoken");
 
-// Middleware to check if user is admin
-const isAdmin = async (req, res, next) => {
-  try {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
-
-    const decodedUserId = UserModel.verifyJwtToken(token);
-    if (!decodedUserId) {
-      return res.status(401).json({ error: "Session expired. Please log in again." });
-    }
-
-    const user = await UserModel.findById(decodedUserId);
-
-    if (!user || user.role !== "admin") {
-      return res.status(403).json({ error: "Access denied. Admin privileges required." });
-    }
-
-    next(); // If user is admin, proceed to the next middleware
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
-  }
-};
 
 // Get all products
 Router.get("/", async (req, res) => {
@@ -52,7 +30,7 @@ Router.post("/add-product", isAdmin, async (req, res) => {
 });
 
 // Update a product
-Router.post("/update-product", isAdmin, async (req, res) => {
+Router.post("/update-product/:productId", isAdmin, async (req, res) => {
   try {
     await ValidateProduct(req.body); // Assuming req.body contains the product data
     const updatedProduct = await ProductModel.findByIdAndUpdate(
@@ -69,7 +47,7 @@ Router.post("/update-product", isAdmin, async (req, res) => {
 });
 
 // Delete a product
-Router.post("/delete-product", isAdmin, async (req, res) => {
+/*Router.post("/delete-product/:productId", isAdmin, async (req, res) => {
   try {
     const deletedProduct = await ProductModel.findByIdAndDelete(
       req.params.productId
@@ -78,6 +56,6 @@ Router.post("/delete-product", isAdmin, async (req, res) => {
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
-});
+});*/
 
 export default Router;

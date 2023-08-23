@@ -1,10 +1,11 @@
 import express from "express";
 import { CartModel, ProductModel, ServiceModel, UserModel } from "../../Database/allModels"; // Adjust the import paths
 import { ValidateCartItem } from "../../Validation/cart";
+ 
 const Router = express.Router();
 
 // Add a product or service to the cart
-Router.post("/add-to-cart/:userId", async (req, res) => {
+Router.post("/add-to-cart/:userId",async (req, res) => {
   try {
     const userId = req.params.userId;
     const { itemType, itemId, quantity } = req.body; // Assuming you receive itemType (product or service), itemId, and quantity
@@ -15,6 +16,7 @@ Router.post("/add-to-cart/:userId", async (req, res) => {
     }
 
     const verifiedUserId = UserModel.verifyJwtToken(token);
+
     if (!verifiedUserId || verifiedUserId !== userId) {
       return res.status(401).json({ error: "Session expired. Please log in again." });
     }
@@ -33,7 +35,7 @@ Router.post("/add-to-cart/:userId", async (req, res) => {
 });
 
 // Remove a product or service from the cart
-Router.delete("/remove/:userId/:itemId", async (req, res) => {
+Router.patch("/remove/:userId/:itemId", async (req, res) => {
   try {
     const { userId, itemId } = req.params;
     const token = req.headers.authorization?.split(' ')[1];
