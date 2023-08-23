@@ -1,5 +1,6 @@
 import Joi from "joi";
 
+//validating for Product items
 export const ValidateProduct = (productData) => {
   const schema = Joi.object({
     name: Joi.string().required(),

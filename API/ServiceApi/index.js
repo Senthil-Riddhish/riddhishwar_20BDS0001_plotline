@@ -5,7 +5,6 @@ import { isAdmin } from "../../Validation/isAdmin";
 const Router = express.Router();
 
 
-
 // Get all services
 Router.get("/", async (req, res) => {
   try {

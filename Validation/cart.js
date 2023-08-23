@@ -1,5 +1,6 @@
 import joi from "joi";
 
+//validating Items before inserting into the cart
 export const ValidateCartItem = (itemData) => {
   const schema = joi.object({
     itemType: joi.string().valid("product", "service").required(),

@@ -1,5 +1,6 @@
 import joi from "joi";
 
+//Validating User/Admin details during Signup
 export const ValidateSignup = (userData) => {
   const Schema = joi.object({
     fullName: joi.string().required().min(5),
@@ -12,6 +13,7 @@ export const ValidateSignup = (userData) => {
   return Schema.validateAsync(userData);
 };
 
+//Validating User/Admin details during Signin
 export const ValidateSignin = (userData) => {
   const Schema = joi.object({
     email: joi.string().email().required(),

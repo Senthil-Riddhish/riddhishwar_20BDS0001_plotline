@@ -1,5 +1,6 @@
 import Joi from "joi";
 
+//validating for Service items
 export const ValidateService = (serviceData) => {
   const schema = Joi.object({
     name: Joi.string().required(),

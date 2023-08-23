@@ -4,7 +4,15 @@ import { ValidateCartItem } from "../../Validation/cart";
 
 const Router = express.Router();
 
-// Add a product or service to the cart
+/**
+ * Router       /add-to-cart/:userId
+ * Des          Add a product or service to the cart
+ * Params       Path params(userId)
+ * Payload      itemType, itemId, quantity
+ * Access       Public
+ * Method       POST
+ */
+
 Router.post("/add-to-cart/:userId", async (req, res) => {
   try {
     const userId = req.params.userId;
@@ -34,7 +42,15 @@ Router.post("/add-to-cart/:userId", async (req, res) => {
   }
 });
 
-// Remove a product or service from the cart
+
+/**
+ * Router       /remove/:userId/:itemId
+ * Des          Remove a product or service from the cart
+ * Params       Path params(userId, itemId)
+ * Access       Public
+ * Method       Patch
+ */
+
 Router.patch("/remove/:userId/:itemId", async (req, res) => {
   try {
     const { userId, itemId } = req.params;
@@ -59,7 +75,14 @@ Router.patch("/remove/:userId/:itemId", async (req, res) => {
   }
 });
 
-// Clear the entire cart for a user
+/**
+ * Router       /clear/:userId
+ * Des          Clear the entire cart for a user
+ * Params       Path params(userId)
+ * Access       Public
+ * Method       delete
+ */
+
 Router.delete("/clear/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
@@ -117,9 +140,14 @@ const calculateTaxAmount = (price, itemType) => {
   }
 };
 
+/**
+ * Router       /view-cart/:userId
+ * Des          In your API route to view the cart
+ * Params       Path params(userId)
+ * Access       Public
+ * Method       GET
+ */
 
-
-// In your API route to view the cart
 Router.get("/view-cart/:userId", async (req, res) => {
   try {
     const userId = req.params.userId;
@@ -182,7 +210,15 @@ Router.get("/view-cart/:userId", async (req, res) => {
   }
 });
 
-// Update the quantity of a product or service in the cart
+/**
+ * Router       /update-quantity/:userId/:itemId
+ * Des          Update the quantity of a product or service in the cart
+ * Params       Path params(userId, itemId)
+ * Payload      quantity
+ * Access       Public
+ * Method       PATCH
+ */
+
 Router.patch("/update-quantity/:userId/:itemId", async (req, res) => {
   try {
     const { userId, itemId } = req.params;

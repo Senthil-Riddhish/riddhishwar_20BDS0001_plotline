@@ -23,6 +23,15 @@ const calculateTaxRate = (price, itemType) => {
   }
 };
 
+
+/**
+ * Router       /confirm-order/:userId
+ * Des          Confirm the order
+ * Params       Path params(userId)
+ * Access       Public
+ * Method       POST
+ */
+
 Router.post("/confirm-order/:userId", async (req, res) => {
   try {
     const userId = req.params.userId;
@@ -113,7 +122,13 @@ Router.post("/confirm-order/:userId", async (req, res) => {
   }
 });
 
-// Admin-only route to view all orders
+/**
+ * Router       /admin/orders
+ * Des          Admin-only route to view all orders
+ * Access       Only Admin
+ * Method       Get
+*/
+
 Router.get("/admin/orders", isAdmin, async (req, res) => {
   try {
     const orders = await OrderModel.find();
@@ -123,6 +138,14 @@ Router.get("/admin/orders", isAdmin, async (req, res) => {
     return res.status(500).json({ error: error.message });
   }
 });
+
+/**
+ * Router       /orders/:userId
+ * Des          orders with userId
+ * Params       Path params(userId)
+ * Access       Based on UserId
+ * Method       GET
+ */
 
 Router.get("/orders/:userId", async (req, res) => {
   try {

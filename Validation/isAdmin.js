@@ -1,6 +1,7 @@
 
 import { UserModel } from "../Database/allModels";
 
+//Validating jwt token for Admin
 export const isAdmin = async (req, res, next) => {
   try {
     const token = req.headers.authorization?.split(' ')[1];

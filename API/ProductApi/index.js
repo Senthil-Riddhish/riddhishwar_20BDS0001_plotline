@@ -32,7 +32,7 @@ Router.post("/add-product", isAdmin, async (req, res) => {
 // Update a product
 Router.post("/update-product/:productId", isAdmin, async (req, res) => {
   try {
-    await ValidateProduct(req.body); // Assuming req.body contains the product data
+    await ValidateProduct(req.body); 
     const updatedProduct = await ProductModel.findByIdAndUpdate(
       req.params.productId,
       {
