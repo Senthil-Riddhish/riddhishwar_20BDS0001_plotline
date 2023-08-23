@@ -1,11 +1,11 @@
 import express from "express";
 import { CartModel, ProductModel, ServiceModel, UserModel } from "../../Database/allModels"; // Adjust the import paths
 import { ValidateCartItem } from "../../Validation/cart";
- 
+
 const Router = express.Router();
 
 // Add a product or service to the cart
-Router.post("/add-to-cart/:userId",async (req, res) => {
+Router.post("/add-to-cart/:userId", async (req, res) => {
   try {
     const userId = req.params.userId;
     const { itemType, itemId, quantity } = req.body; // Assuming you receive itemType (product or service), itemId, and quantity
@@ -135,7 +135,7 @@ Router.get("/view-cart/:userId", async (req, res) => {
     if (!verifiedUserId || verifiedUserId !== userId) {
       return res.status(401).json({ error: "Session expired. Please log in again." });
     }
-    
+
     if (!userCart) {
       return res.status(404).json({ error: "Cart not found" });
     }
@@ -184,5 +184,38 @@ Router.get("/view-cart/:userId", async (req, res) => {
   }
 });
 
+// Update the quantity of a product or service in the cart
+Router.patch("/update-quantity/:userId/:itemId", async (req, res) => {
+  console.log("inside the logfunction");
+  try {
+    const { userId, itemId } = req.params;
+    const { quantity } = req.body;
+
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) {
+      return res.status(401).json({ error: "Unauthorized" });
+    }
+
+    const verifiedUserId = UserModel.verifyJwtToken(token);
+    if (!verifiedUserId || verifiedUserId !== userId) {
+      return res.status(401).json({ error: "Session expired. Please log in again." });
+    }
+
+    // Update the quantity of the specified item in the user's cart
+    const updatedCart = await CartModel.findOneAndUpdate(
+      { userId, "items.itemId": itemId },
+      { $set: { "items.$.quantity": quantity } },
+      { new: true }
+    );
+
+    if (!updatedCart) {
+      return res.status(404).json({ error: "Cart not found or item not in cart" });
+    }
+
+    return res.status(200).json({ message: "Quantity updated successfully", cart: updatedCart });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
 
 export default Router;
