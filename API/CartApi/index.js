@@ -149,7 +149,6 @@ Router.get("/view-cart/:userId", async (req, res) => {
       }
 
       const itemPrice = item.price;
-      //console.log(itemPrice,cartItem.itemType);
       const itemTaxRate = calculateTaxAmount(itemPrice, cartItem.itemType);
       const itemTax = itemPrice + itemTaxRate;
       const itemTotal = itemTax * cartItem.quantity;
@@ -170,7 +169,6 @@ Router.get("/view-cart/:userId", async (req, res) => {
 
     const totalCost = validCartItems.reduce((total, item) => total + item.itemPrice * item.quantity, 0);
     const totalTax = validCartItems.reduce((total, item) => total + item.itemTaxRate * item.quantity, 0);
-    console.log(totalTax);
     const totalBill = totalCost + totalTax;
 
     return res.status(200).json({
@@ -186,7 +184,6 @@ Router.get("/view-cart/:userId", async (req, res) => {
 
 // Update the quantity of a product or service in the cart
 Router.patch("/update-quantity/:userId/:itemId", async (req, res) => {
-  console.log("inside the logfunction");
   try {
     const { userId, itemId } = req.params;
     const { quantity } = req.body;
