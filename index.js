@@ -2,7 +2,7 @@
 require("@babel/core").transform("code", {
   presets: ["@babel/preset-env"],
 });
-
+require("dotenv").config();
 //importing Libraries
 import express from "express";
 import cors from "cors";
@@ -25,12 +25,15 @@ plotline.use(helmet());
 
 
 // Application Routes
+plotline.get('/', (req, res) => {
+  res.json({ message: 'Server is running !!!' });
+});
 plotline.use("/auth", Auth);
-plotline.use("/product",Product);
-plotline.use("/service",Service);
-plotline.use("/cart",Cart);
-plotline.use("/order",Order);
-plotline.use("/display",display);
+plotline.use("/product", Product);
+plotline.use("/service", Service);
+plotline.use("/cart", Cart);
+plotline.use("/order", Order);
+plotline.use("/display", display);
 
 
 
@@ -38,7 +41,7 @@ plotline.use("/display",display);
 plotline.listen(4000, () => {
   ConnectDB()
     .then(() => {
-      console.log("Server is running !!!");
+      console.log("Server is running...");
     })
     .catch((error) => {
       console.log("Server is running, but database connection failed...");
