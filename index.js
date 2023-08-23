@@ -15,6 +15,7 @@ import Auth from "./API/Auth";
 import Product from './API/ProductApi';
 import Service from "./API/ServiceApi";
 import Cart from "./API/CartApi";
+import Order from "./API/OrderApi";
 
 const plotline = express();
 plotline.use(cors());
@@ -27,6 +28,8 @@ plotline.use("/auth", Auth);
 plotline.use("/product",Product);
 plotline.use("/service",Service);
 plotline.use("/cart",Cart);
+plotline.use("/order",Order);
+
 
 
 

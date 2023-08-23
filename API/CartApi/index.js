@@ -72,17 +72,17 @@ async function getItemDetails(itemId, itemType) {
 const calculateTaxAmount = (price, itemType) => {
   if (itemType === "product") {
     if (price > 1000 && price <= 5000) {
-      return price * 0.12; // ApplyTaxPA
+      return (price*0.12)+200; // ApplyTaxPA
     } else if (price > 5000) {
-      return price * 0.18; // ApplyTaxPB
+      return (price*0.18)+200; // ApplyTaxPB
     } else {
       return 200; // ApplyTaxPC
     }
   } else if (itemType === "service") {
     if (price > 1000 && price <= 8000) {
-      return price * 0.10; // ApplyTaxSA
+      return (price*0.10)+100; // ApplyTaxSA
     } else if (price > 8000) {
-      return price * 0.15; // ApplyTaxSB
+      return (price*0.15)+100; // ApplyTaxSB
     } else {
       return 100; // ApplyTaxSC
     }
