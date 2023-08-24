@@ -6,6 +6,19 @@ An online billing system is essential for businesses to manage their invoicing, 
 
 *Note: Please take the Jwt token when you do the following actions and place it in Headers Authorization(Bearer [Replace it here]) for both User/Admin whenever necessary.*
 
+## Guidence to run the code Locally
+### Install npm packages
+```
+npm install
+```
+### To run the server in Production phase
+```
+npm run start
+```
+### To run the server in Development phase
+```
+npm run dev
+```
 ## Click each collection name to see the description:
 
 ### Collection:
